@@ -30,7 +30,7 @@ Clone these to the `./models` directory in this working copy.
 
 **NOTE** After installing MSVC Build Tools, ensure the following components are also installed:
 
-![visual studio installer window](./visual-studio-installer.png)
+![visual studio installer window](./docs/visual-studio-installer.png)
 
 You must also add the Windows 10 SDK path to your `PATH` environment variable. For example, `C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64`.
 
