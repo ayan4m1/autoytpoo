@@ -17,6 +17,10 @@ stdout.reconfigure(encoding="utf-8")
 
 parser = argparse.ArgumentParser(description='Generate a cursed video')
 
+parser.add_argument('--image-style', type=str, default='an image that would not make sense',
+                    help='Phrase to pass in to image prompt generator')
+parser.add_argument('--narrator-style', type=str, default='David Attenborough',
+                    help='Phrase to pass in to voiceover script generator')
 parser.add_argument('--temperature', type=float, default=0.7,
                     help='Randomness of generated text')
 parser.add_argument('--width', type=int, default=768,
@@ -78,22 +82,22 @@ def get_project_path(filename):
     return f'./output/{project_name}/{filename}'
 
 
-base_prompt = 'Input: Generate a text description of an image that would not make sense. It should be surreal and use simple language.\n\nOutput: '
+base_prompt = f'Input: Generate a text description of {args.image_style}. It should be surreal and use simple language.\n\nOutput: '
 
 print('1/6 :: Generating base prompt...')
 
 llama_pipe = get_llama_pipe()
-llama_output = llama_pipe(base_prompt, eos_token_id=llama_pipe.tokenizer.eos_token_id, do_sample=True, temperature=args.temperature, max_new_tokens=50)[
+llama_output = llama_pipe(base_prompt, eos_token_id=llama_pipe.tokenizer.eos_token_id, do_sample=True, top_p=0.4, temperature=args.temperature, max_new_tokens=50)[
     0]['generated_text'].replace(base_prompt, '').strip()
 
 print(f'Base prompt: {llama_output}')
 
-base_script_prompt = f'Input: Generate a voiceover script in the style of a drunken David Attenborough describing the following scene: "{llama_output}". Answer with the script directly, do not prepend any text.\n\nOutput: '
+base_script_prompt = f'Input: Generate a voiceover script in the style of {args.narrator_style} describing the following scene: "{llama_output}". Answer with the script directly, do not prepend any text.\n\nOutput: '
 
 print('2/6 :: Generating voiceover script...')
 
 llama_script_output = llama_pipe(base_script_prompt, eos_token_id=llama_pipe.tokenizer.eos_token_id,
-                                 do_sample=True, temperature=args.temperature, max_new_tokens=300)[0]['generated_text'].replace(base_script_prompt, '').strip()
+                                 do_sample=True, top_p=0.4, temperature=args.temperature, max_new_tokens=300)[0]['generated_text'].replace(base_script_prompt, '').strip()
 
 with open(get_project_path('script.txt'), 'w') as script_file:
     script_file.write(llama_script_output)
